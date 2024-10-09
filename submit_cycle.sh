@@ -50,7 +50,8 @@ while [ $date_count -lt $cycles_per_job ]; do
     HH=`echo $THISDATE | cut -c9-10`
 
     # substringing to get yr, mon, day, hr info for previous cycle
-    PREVDATE=`${incdate} $THISDATE -6`
+    # PREVDATE=`${incdate} $THISDATE -6`
+    PREVDATE=`${incdate} $thisdate $win_del` 
     YYYP=`echo $PREVDATE | cut -c1-4`
     MP=`echo $PREVDATE | cut -c5-6`
     DP=`echo $PREVDATE | cut -c7-8`
@@ -62,21 +63,6 @@ while [ $date_count -lt $cycles_per_job ]; do
     nMM=`echo $NEXTDATE | cut -c5-6`
     nDD=`echo $NEXTDATE | cut -c7-8`
     nHH=`echo $NEXTDATE | cut -c9-10`
-
-    ############################
-    # copy restarts to workdir, convert to vector for DA (all members) 
-
-    mem_ens="mem000" 
-
-    MEM_WORKDIR=${WORKDIR}/${mem_ens}
-    MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
-
-    cd $MEM_WORKDIR
-
-    # copy restarts into work directory
-    rst_in=${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_back.${YYYY}-${MM}-${DD}_${HH}-00-00.nc 
-    rst_out=${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-    cp $rst_in $rst_out 
 
     if [[ $do_jedi == "YES" ]]; then  
         echo '************************************************'
@@ -102,11 +88,41 @@ while [ $date_count -lt $cycles_per_job ]; do
         echo '************************************************'
         echo 'calling vector2tile' 
         source ${CYCLEDIR}/land_mods
-        $vec2tileexec vector2tile.namelist
-        if [[ $? != 0 ]]; then
-            echo "vec2tile failed"
-            exit 
-        fi
+
+        ############################
+        # copy restarts to workdir, convert to vector for DA (all members) 
+
+        for ie in $(seq $ensemble_size)
+        do
+            # mem_ens="mem000" 
+            if [$ensemble_size  == 1 ]; then 
+                mem_ens="mem000" 
+            else 
+                mem_ens="mem`printf %03i $ie`"
+            fi 
+
+            MEM_WORKDIR=${WORKDIR}/${mem_ens}
+            MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
+
+            # copy restarts into work directory
+            rst_in=${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_back.${YYYY}-${MM}-${DD}_${HH}-00-00.nc 
+            rst_out=${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
+            cp $rst_in $rst_out 
+            cp vector2tile.namelist $MEM_WORKDIR
+
+            cd $MEM_WORKDIR
+            $vec2tileexec vector2tile.namelist
+            if [[ $? != 0 ]]; then
+                echo "vec2tile failed for ens mem "$ie
+                # for i in $(seq 6) do 
+                #     tile_out = ${MEM_WORKDIR}/${YYYY}-${MM}-${DD}_${HH}-00-00_sfc_data.tile$i.nc
+                #     rm $tile_out
+                # done
+                exit 
+            fi
+            # rm $rst_out
+        done
+        wait
     fi # vector2tile for DA
 
     ############################
@@ -129,16 +145,10 @@ while [ $date_count -lt $cycles_per_job ]; do
     fi 
 
     ############################
-    #  convert back to vector, run model (all members) convert back to vector, run model (all members)
-
-    mem_ens="mem000" 
-
-    MEM_WORKDIR=${WORKDIR}/${mem_ens}
-    MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
-
-    cd $MEM_WORKDIR
+    #  convert back to vector, run model (all members) 
 
     if [[ $do_jedi == "YES" ]]; then  
+
         echo '************************************************'
         echo 'calling tile2vector' 
         source ${CYCLEDIR}/land_mods
@@ -153,18 +163,54 @@ while [ $date_count -lt $cycles_per_job ]; do
         sed -i -e "s/XXTSTUB/${TSTUB}/g" tile2vector.namelist
         sed -i -e "s#XXTPATH#${TPATH}#g" tile2vector.namelist
 
-        $vec2tileexec tile2vector.namelist
-        if [[ $? != 0 ]]; then
-            echo "tile2vector failed"
-            exit 
-        fi
+        for ie in $(seq $ensemble_size)
+        do
+            # mem_ens="mem000" 
+            if [$ensemble_size  == 1 ]; then 
+                mem_ens="mem000" 
+            else 
+                mem_ens="mem`printf %03i $ie`"
+            fi 
 
-        # save analysis restart
-        cp ${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
+            MEM_WORKDIR=${WORKDIR}/${mem_ens}
+            MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
+
+            cp tile2vector.namelist $MEM_WORKDIR
+
+            # rst_out=${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
+
+            cd $MEM_WORKDIR
+            $vec2tileexec tile2vector.namelist
+            if [[ $? != 0 ]]; then
+                echo "tile2vector failed for ens mem "$ie
+                # rm $rst_out
+                exit 
+            fi
+
+            # save analysis restart
+            cp ${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
+
+            # for i in $(seq 6) do 
+            #     tile_out = ${MEM_WORKDIR}/${YYYY}-${MM}-${DD}_${HH}-00-00_sfc_data.tile$i.nc
+            #     rm $tile_out
+            # done
+        done
+        wait
+
+    fi
+
+
+# Forcing perturbation goes here
+    if [[ $do_enkf == "YES" ]]; then 
+
     fi
 
     ############################
     # run the forecast model
+    echo '************************************************'
+    echo "calling model"
+    source ${CYCLEDIR}/land_mods
+    module list
 
     # update model namelist 
     cp  ${CYCLEDIR}/template.ufs-noahMP.namelist.${atmos_forc}  ufs-land.namelist
@@ -177,35 +223,60 @@ while [ $date_count -lt $cycles_per_job ]; do
     sed -i -e "s/XXRDD/${RDD}/g" ufs-land.namelist
     sed -i -e "s/XXRHH/${RHH}/g" ufs-land.namelist
 
-    # run for using baseline snow parameter table
-    cp ${CYCLEDIR}/ufs-land-driver/ccpp-physics/physics/SFC_Models/Land/Noahmp/noahmptable.tbl noahmptable.tbl
+    for ie in $(seq $ensemble_size)
+    do
+        # mem_ens="mem000" 
+        if [$ensemble_size  == 1 ]; then 
+            mem_ens="mem000" 
+        else 
+            mem_ens="mem`printf %03i $ie`"
+        fi 
 
-    # submit model
-    echo '************************************************'
-    echo "calling model"
-    source ${CYCLEDIR}/land_mods
-    module list
+        MEM_WORKDIR=${WORKDIR}/${mem_ens}
+        MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
+
+        # run for using baseline snow parameter table
+        cp ${CYCLEDIR}/ufs-land-driver/ccpp-physics/physics/SFC_Models/Land/Noahmp/noahmptable.tbl $MEM_WORKDIR/noahmptable.tbl 
+
+        cp ufs-land.namelist $MEM_WORKDIR
+
+        cd $MEM_WORKDIR
+
+    done
+
+    # submit model   
     echo $MEM_WORKDIR
     nt=$SLURM_NTASKS
     #srun -n $nt $LSMexec
     #mpirun -n 1 $LSMexec
+
+    srun -l --multi-prog $regrid_tasks_file
     srun '--export=ALL' --label -K -n $nt $LSMexec
     # no error codes on exit from model, check for restart below instead
 
-    ############################
-    # check model ouput (all members)
+     # no error codes on exit from model, check for restart below instead
+    for ie in $(seq $ensemble_size)
+    do
+        # mem_ens="mem000" 
+        if [$ensemble_size  == 1 ]; then 
+            mem_ens="mem000" 
+        else 
+            mem_ens="mem`printf %03i $ie`"
+        fi 
 
-    mem_ens="mem000" 
+        MEM_WORKDIR=${WORKDIR}/${mem_ens}
+        MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
 
-    MEM_WORKDIR=${WORKDIR}/${mem_ens}
-    MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
+        ############################
+        # check model ouput (all members)
 
-    if [[ -e ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ]]; then 
-       cp ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_back.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc
-    else 
-       echo "Something is wrong, probably the model, exiting" 
-       exit
-    fi
+        if [[ -e ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ]]; then 
+        cp ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_back.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc
+        else 
+        echo "Something is wrong, probably the model, exiting" 
+        exit
+        fi
+    done
 
     echo "Finished job number, ${date_count},for  date: ${THISDATE}" >> $logfile
 

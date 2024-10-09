@@ -14,10 +14,15 @@ export OUTDIR=/scratch2/BMC/gsienkf/${USER}/cycle_land/${exp_name}/
 
 # for LETKF, this is size of ensemble.
 # for LETKF-OI pseudo ensemble, or non-ensemble runs use 1 
-export ensemble_size=
+export ensemble_size=20
+
+# adding it here to have flexible simulation 'duration'
+export win_del=-6
+#  DA window lenth. Will generally be the same as the FCSTLEN 
+export WINLEN=6  #win_len=6
 
 # length of each forecast
-export FCSTHR=
+export FCSTHR=24
 
 #forcing options: gdas, gswp3, gefs_ens
 export atmos_forc=
@@ -38,11 +43,15 @@ export ICSDIR=/scratch2/BMC/gsienkf/Clara.Draper/DA_test_cases/land-offline_work
 
 # namelist for do_landDA.sh
 # set to "openloop" to not call do_landDA.sh
-export DA_config=
+export DA_config="openloop"
+# export DA_config="settings_DA_test"p
 
 # if want different DA at different times, list here. 
 export DA_config00=${DA_config} 
 export DA_config06=${DA_config} 
 export DA_config12=${DA_config} 
 export DA_config18=${DA_config} 
+
+# decide if GFSv17
+export GFSv17="NO"
 

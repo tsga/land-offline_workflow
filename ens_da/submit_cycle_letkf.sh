@@ -238,7 +238,7 @@ while [ $date_count -lt $dates_per_job ]; do
     forc_file=${forcing_dir}/${forc_inp_file}
     for ie in $ens_list      #[@]}"
     do  
-        cp ${forc_file} ${cycle_dir}/ens$ie
+        cp ${forc_file} ${cycle_dir}/ens$ie   &
     done
     wait
 
@@ -317,7 +317,7 @@ while [ $date_count -lt $dates_per_job ]; do
 
     for ie in $ens_list   #$mem_list   # "${ens_list[@]}"
     do
-        run_v2t $ie
+        run_v2t $ie    &
     done
     wait
 

@@ -12,10 +12,6 @@ export OUTDIR=/scratch2/BMC/gsienkf/${USER}/cycle_land/${exp_name}/
 
 ############################
 
-# for LETKF, this is size of ensemble.
-# for LETKF-OI pseudo ensemble, or non-ensemble runs use 1 
-export ensemble_size=20
-
 # adding it here to have flexible simulation 'duration'
 export win_del=-6
 #  DA window lenth. Will generally be the same as the FCSTLEN 
@@ -29,6 +25,7 @@ export atmos_forc=
 
 #FV3 resolution
 export RES=
+export NPZ=127   # vertical layers
 export TPATH=
 export TSTUB= # file stub for orography files in $TPATH
               # oro_C${RES} for atm only, oro_C${RES}.mx100 for atm/ocean.
@@ -54,4 +51,17 @@ export DA_config18=${DA_config}
 
 # decide if GFSv17
 export GFSv17="NO"
+
+# run (true) ensemble. NO for LETKFOI
+export do_enkf="NO"
+# for LETKF, this is size of ensemble.
+# for LETKF-OI pseudo ensemble, or non-ensemble runs use 1 
+export ensemble_size=20
+export num_tiles=6         # 1 for regional
+
+export forcing_prefix=C${RES}_GDAS_forcing_
+export forcing_dir=
+export stochy_init_exist="YES"
+export stochy_init_dir=
+export EnsForcGenExe=
 

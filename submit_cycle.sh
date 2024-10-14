@@ -199,9 +199,65 @@ while [ $date_count -lt $cycles_per_job ]; do
 
     fi
 
-
 # Forcing perturbation goes here
     if [[ $do_enkf == "YES" ]]; then 
+
+        #cp template.input.nml input.nml
+        cp  ${CYCLEDIR}/template.generate_ens_forc.nml generate_ens_forc.nml
+
+        forc_inp_file=${forcing_prefix}${YYYY}-${MM}-${DD}.nc  #C${RES}_GDAS_forcing_${YYYY}-${MM}-${DD}.nc
+
+        sed -i -e "s/FORINPFILE/${forc_inp_file}/g" generate_ens_forc.nml
+        sed -i -e "s/YYYY/${YYYY}/g" generate_ens_forc.nml
+        sed -i -e "s/MM/${MM}/g" generate_ens_forc.nml
+        sed -i -e "s/DD/${DD}/g" generate_ens_forc.nml
+        sed -i -e "s/HH/${HH}/g" generate_ens_forc.nml
+        sed -i -e "s/XXRES/${RES}/g" generate_ens_forc.nml
+
+        # Make sure the INPUT and RESTART dirs for stochy are in working dir
+        # and input.nml has settings right  
+
+        cp ${CYCLEDIR}/template.input.nml input.nml
+        if [[ $stochy_init_exist == "YES" ]]; then
+           sed -i -e "s/STOCH_INI_VAL/.TRUE./g" input.nml
+        else
+           sed -i -e "s/STOCH_INI_VAL/.FALSE./g" input.nml
+        fi
+
+        if [[ ! -e ${WORKDIR}/INPUT ]]; then
+            mkdir -p ${WORKDIR}/INPUT
+        fi
+
+        if [[ ! -e ${WORKDIR}/RESTART ]]; then
+            mkdir -p ${WORKDIR}/RESTART
+            if [[ ! -e ${stochy_init_dir} ]]; then
+                echo "Error! the directory forStochy init files ${stochy_init_dir} doesn't exist"
+                exit
+            else
+                cp $stochy_init_dir/* ${WORKDIR}/RESTART
+            fi
+        fi
+
+        forc_file=${forcing_dir}/${forc_inp_file}
+        for ie in $(seq $ensemble_size)
+        do
+            mem_ens="mem`printf %03i $ie`" 
+            cp ${forc_file} ${WORKDIR}/${mem_ens}   &
+        done
+        wait
+
+        # generate ensemble forcing
+        echo 'Running Ens Forc Gen with Stochy'         #>> $logfile
+        source ${cycle_dir}/modules_stochy.sh
+        
+        module list
+        
+        nt=$SLURM_NTASKS
+        time srun '--export=ALL' --label -K -n $nt $EnsForcGenExe
+        if [[ $? != 0 ]]; then
+            echo "EnsForc Gen failed"
+            exit 10
+        fi
 
     fi
 
@@ -222,7 +278,7 @@ while [ $date_count -lt $cycles_per_job ]; do
     sed -i -e "s/XXFREQ/${FREQ}/g" ufs-land.namelist
     sed -i -e "s/XXRDD/${RDD}/g" ufs-land.namelist
     sed -i -e "s/XXRHH/${RHH}/g" ufs-land.namelist
-
+    
     for ie in $(seq $ensemble_size)
     do
         # mem_ens="mem000" 
@@ -238,23 +294,44 @@ while [ $date_count -lt $cycles_per_job ]; do
         # run for using baseline snow parameter table
         cp ${CYCLEDIR}/ufs-land-driver/ccpp-physics/physics/SFC_Models/Land/Noahmp/noahmptable.tbl $MEM_WORKDIR/noahmptable.tbl 
 
-        cp ufs-land.namelist $MEM_WORKDIR
-
-        cd $MEM_WORKDIR
+        cp ufs-land.namelist $MEM_WORKDIR    &
 
     done
+    wait
 
     # submit model   
-    echo $MEM_WORKDIR
-    nt=$SLURM_NTASKS
-    #srun -n $nt $LSMexec
-    #mpirun -n 1 $LSMexec
+    nt=$SLURM_NTASKS/$ensemble_size   #Note the extra tasks remain idle
 
-    srun -l --multi-prog $regrid_tasks_file
-    srun '--export=ALL' --label -K -n $nt $LSMexec
-    # no error codes on exit from model, check for restart below instead
+    # # srun -l --multi-prog $lsm_tasks_file
+    # time srun '--export=ALL' --label -K -n $nt $LSMexec
+    # if [[ $? != 0 ]]; then
+    #     echo "NoahMP failed"
+    #     exit 10
+    # fi 
+    for ie in $(seq $ensemble_size)
+    do
+        # mem_ens="mem000" 
+        if [$ensemble_size  == 1 ]; then 
+            mem_ens="mem000" 
+        else 
+            mem_ens="mem`printf %03i $ie`"
+        fi 
 
-     # no error codes on exit from model, check for restart below instead
+        MEM_WORKDIR=${WORKDIR}/${mem_ens}
+
+        cd $MEM_WORKDIR
+        
+#TODO: modify NoahMP to have mpi-group for each ensemble member and compare runtimes
+        time srun '--export=ALL' --label -K -n $nt $LSMexec   &  
+        # #-N1-1 --exclusive
+        # if [[ $? != 0 ]]; then
+        #     echo "NoahMP failed for ensemble $ie"
+        #     exit 10
+        # fi   
+    done
+    wait
+
+    
     for ie in $(seq $ensemble_size)
     do
         # mem_ens="mem000" 
@@ -267,16 +344,22 @@ while [ $date_count -lt $cycles_per_job ]; do
         MEM_WORKDIR=${WORKDIR}/${mem_ens}
         MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
 
-        ############################
+        # no error codes on exit from model, check for restart below instead
         # check model ouput (all members)
-
         if [[ -e ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ]]; then 
-        cp ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_back.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc
+            cp ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_back.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc
         else 
-        echo "Something is wrong, probably the model, exiting" 
-        exit
+            echo "Something is wrong, probably model runtime error, exiting" 
+            exit
         fi
+
+        # delete forcing ens files
+        if [[ $do_enkf == "YES" ]]; then
+            rm ${MEM_WORKDIR}/${forc_inp_file}
+        fi
+        
     done
+    wait
 
     echo "Finished job number, ${date_count},for  date: ${THISDATE}" >> $logfile
 

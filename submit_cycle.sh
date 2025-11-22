@@ -92,7 +92,7 @@ while [ $date_count -lt $cycles_per_job ]; do
         ############################
 
         echo '************************************************'
-        echo 'calling tile2vector' 
+        echo 'calling vector2tile' 
 
         export MEM_WORKDIR
 

@@ -13,4 +13,4 @@
 [submodule "stochastic_physics"]
 	path = stochastic_physics
 	url = https://github.com/tsga/stochastic_physics
-	branch = lnd_ens
+	branch = land_ens_dev

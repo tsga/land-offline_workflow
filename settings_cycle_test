@@ -14,6 +14,8 @@ export WORKDIR=${BASEDIR}/workdir/
 # directory where output is saved
 export OUTDIR=${BASEDIR}/cycle_land/${exp_name}/
 
+# directory of land-offline_workflow repo
+export CYCLEDIR=${BASEDIR}/land-offline_workflow/
 ############################
 
 # run (true) ensemble. NO for LETKFOI
@@ -21,7 +23,11 @@ export do_enkf="NO"
 
 # for LETKF, this is size of ensemble.
 # for LETKF-OI pseudo ensemble, or non-ensemble runs use 1 
-export ensemble_size=1
+export ensemble_size=20
+
+# number of tiles and vector size
+export num_tiles=6         # 1 for regional
+export vector_size=18320   # 1067297 C768
 
 # number of tiles
 export num_tiles=6         # 1 for regional
@@ -30,9 +36,8 @@ export vector_size=18320   # hr3 land vectors C384:272699  C96:18320   C768:1067
 
 # length of each forecast
 export FCSTHR=24
-
-#forcing options: gdas, gswp3, gefs_ens, era5
-export atmos_forc=era5
+# delta to previous cycle --6 always?
+export PCYC_DEL=6
 
 #FV3 resolution
 export RES=96

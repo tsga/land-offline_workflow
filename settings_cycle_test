@@ -1,7 +1,7 @@
 # Settings file for submit_cycle, for running the DA_IMS_test 
 
 # experiment name
-export exp_name=DA_bump_smap_era5   #DA_ims_ghcn_era5
+export exp_name=DA_letkf_smap_era5   
 STARTDATE=2021120100  #2019120112
 ENDDATE=2021120400    #2019120400
 
@@ -19,15 +19,11 @@ export CYCLEDIR=${BASEDIR}/land-offline_workflow/
 ############################
 
 # run (true) ensemble. NO for LETKFOI
-export do_enkf="NO"
+export do_enkf="YES"
 
 # for LETKF, this is size of ensemble.
 # for LETKF-OI pseudo ensemble, or non-ensemble runs use 1 
 export ensemble_size=20
-
-# number of tiles and vector size
-export num_tiles=6         # 1 for regional
-export vector_size=18320   # 1067297 C768
 
 # number of tiles
 export num_tiles=6         # 1 for regional

@@ -34,8 +34,8 @@
   
   run_timesteps    = 0       ! number of timesteps to run
   
-  location_start           = 1
-  location_end           = 18320
+  location_start   = 1
+  location_end     = XXVLEN
   
 /
 
@@ -77,10 +77,10 @@
  forcing_regrid                 = "none"
  forcing_regrid_weights_filename= ""
  forcing_type                   = "dd_1h"
- forcing_filename               = "C96_ERA5_forcing_"
+ forcing_filename               = "ERA5-CXXRES.XXORES_hr3_datm_"
  forcing_interp_solar           = "zenith"          ! zenith or linear
  forcing_time_solar             = "period_average"  ! period_average or instantaneous
- forcing_name_precipitation     = "precipitation_bilinear"
+ forcing_name_precipitation     = "precipitation"
  forcing_name_temperature       = "temperature"
  forcing_name_specific_humidity = "specific_humidity"
  forcing_name_wind_speed        = "wind_speed"

@@ -1,20 +1,22 @@
 #!/bin/bash -le 
 #SBATCH --job-name=offline_noahmp
-#SBATCH --account=da-cpu
+#SBATCH --account=gsienkf
 #SBATCH --qos=debug
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=6
+#SBATCH -t 00:30:00
 #SBATCH --cpus-per-task=1
 #SBATCH -t 00:30:00
 #SBATCH -o erlog_noahmp.%j
 #SBATCH -e erlog_noahmp.%j
 ##SBATCH -t 02:40:00
 ##SBATCH --qos=batch
-##SBATCH --nodes=2
+##SBATCH --nodes=6
 ##SBATCH --tasks-per-node=36
 
 ############################
 # loop over time steps
+############################
 
 echo 'starting cycle' 
 date
@@ -38,10 +40,14 @@ while [ $date_count -lt $cycles_per_job ]; do
 
     echo "starting $THISDATE"  
 
+    ############################
     # get DA settings
+    ############################
 
     this_config=DA_config$HH
     DA_config=${!this_config}
+    
+    frac_grid=.true.
 
     if [ $DA_config == "openloop" ]; then do_jedi="NO" ; else do_jedi="YES" ; fi 
 
@@ -78,8 +84,10 @@ while [ $date_count -lt $cycles_per_job ]; do
         sed -i -e "s/XXDD/${DD}/g" vector2tile.namelist
         sed -i -e "s/XXHH/${HH}/g" vector2tile.namelist
         sed -i -e "s/XXRES/${RES}/g" vector2tile.namelist
+	sed -i -e "s/XXORES/${ORES}/g" vector2tile.namelist
         sed -i -e "s/XXTSTUB/${TSTUB}/g" vector2tile.namelist
         sed -i -e "s#XXTPATH#${TPATH}#g" vector2tile.namelist
+        sed -i -e "s/XXFRACGRID/${frac_grid}/g" vector2tile.namelist
 
         # submit vec2tile 
         echo '************************************************'
@@ -147,7 +155,7 @@ while [ $date_count -lt $cycles_per_job ]; do
         # ############################
         # submit snow DA 
         echo '************************************************'
-        echo 'CSD calling snow DA'
+        echo 'CSD calling land DA'
 
         cd $WORKDIR
 
@@ -174,8 +182,10 @@ while [ $date_count -lt $cycles_per_job ]; do
         sed -i -e "s/XXDD/${DD}/g" tile2vector.namelist
         sed -i -e "s/XXHH/${HH}/g" tile2vector.namelist
         sed -i -e "s/XXRES/${RES}/g" tile2vector.namelist
+	sed -i -e "s/XXORES/${ORES}/g" tile2vector.namelist
         sed -i -e "s/XXTSTUB/${TSTUB}/g" tile2vector.namelist
         sed -i -e "s#XXTPATH#${TPATH}#g" tile2vector.namelist
+        sed -i -e "s/XXFRACGRID/${frac_grid}/g" tile2vector.namelist 
 
         # mem000 is either for 1 member cases (2DVar) or LETKF ens mean	
         mem_ens="mem000" 
@@ -322,6 +332,7 @@ while [ $date_count -lt $cycles_per_job ]; do
 
     ############################
     # run the forecast model
+    ############################
 
     cd $WORKDIR
 
@@ -332,9 +343,12 @@ while [ $date_count -lt $cycles_per_job ]; do
     sed -i -e "s/XXMM/${MM}/g" ufs-land.namelist
     sed -i -e "s/XXDD/${DD}/g" ufs-land.namelist
     sed -i -e "s/XXHH/${HH}/g" ufs-land.namelist
+    sed -i -e "s/XXRES/${RES}/g" ufs-land.namelist
+    sed -i -e "s/XXORES/${ORES}/g" ufs-land.namelist
     sed -i -e "s/XXFREQ/${FREQ}/g" ufs-land.namelist
     sed -i -e "s/XXRDD/${RDD}/g" ufs-land.namelist
     sed -i -e "s/XXRHH/${RHH}/g" ufs-land.namelist
+    sed -i -e "s#XXVLEN#${vector_size}#g" ufs-land.namelist
 
     if [[ $do_enkf == "YES" ]]; then 
         sed -i -e "s#XXFORCDIR#"./"#g" ufs-land.namelist
@@ -390,6 +404,7 @@ while [ $date_count -lt $cycles_per_job ]; do
 
     ############################
     # check model ouput (all members)
+    ############################
 
     for ie in $(seq $ensemble_size)
     do
@@ -454,6 +469,7 @@ done #  date_count -lt cycles_per_job
 
 ############################
 # resubmit script 
+############################
 
 if [ $THISDATE -lt $ENDDATE ]; then
     echo "STARTDATE=${THISDATE}" > ${analdate}

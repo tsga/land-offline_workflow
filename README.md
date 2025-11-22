@@ -1,4 +1,4 @@
-Script to run cycling DA using JEDI in cube sphere space, and offline Noah-MP model in vector space. 
+Script to run cycling DA using GDASApp in cube sphere space, and offline Noah-MP model in vector space. 
 
 Clara Draper, Nov, 2021.
 
@@ -20,25 +20,25 @@ COMPILING and TESTING.
 >source land_mods
 (these are the modules needed for steps 2b, 2c).
 
-2b.
-> cd vector2tile 
-> configure 
-     select hera
-> make 
-> cd .. 
-
-2c. 
+2b. 
 > cd ufs-land-driver
 > configure 
-  select hera parallel
+  select ursa parallel or hera parallel
 > make 
 > cd ..
+
+2c.
+> cd vector2tile 
+> configure 
+  select ursa parallel or hera parallel
+> make 
+> cd .. 
 
 2d.
 > cd DA_update
 > make_links.sh
 > build_all.sh 
-> cd .. 
+> cd ..
 
 2e. (Compiling the ensemble generator in release mode. To compile in debug mode, change DEBUG=YES in stochastic_physics/compile_ens.hera_intel)
 > cd stochastic_physics 
@@ -47,7 +47,7 @@ COMPILING and TESTING.
 
 3. Run the test.
 
- in settings_cycle_test check WORKDIR and OUTDIR are OK
+ in settings_cycle_test check BASEDIR, WORKDIR and OUTDIR are OK
  create OUTDIR
  in submit_cycle.sh change #SBATCH --account=gsienkf to point to your own account.
 
@@ -74,26 +74,4 @@ $ICSDIR/output/mem000/restarts/vector/ufs_land_restart.2015-09-02_18-00-00.nc
 5. Submit your job 
 
 >do_submit_cycle.sh your-settings-filename
-
-
-###################################################
-IGNORE THIS - OUTDATED.
-
-Jong's instructions for compiling with CMake.
-
-1. git clone -b feature/bundle-cmake https://github.com/jkbk2004/land-offline_workflow-1
-
-2. cd land-offline_workflow-1/
-
-3. git submodule update --init --recursive
-
-4. mkdir build
-
-5. source configures/machine.orion.intel
-
-6. cd build/
-
-7. ecbuild ..
-
-8. make -j 1
 

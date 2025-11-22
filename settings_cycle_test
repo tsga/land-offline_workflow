@@ -15,7 +15,8 @@ export WORKDIR=${BASEDIR}/workdir/
 export OUTDIR=${BASEDIR}/cycle_land/${exp_name}/
 
 # directory of land-offline_workflow repo
-export CYCLEDIR=${BASEDIR}/land-offline_workflow/
+# export CYCLEDIR=/scratch4/BMC/gsienkf/${USER}/land-offline_workflow/
+export CYCLEDIR=/scratch3/NCEPDEV/da/${USER}/land-offline_workflow/
 ############################
 
 # run (true) ensemble. NO for LETKFOI

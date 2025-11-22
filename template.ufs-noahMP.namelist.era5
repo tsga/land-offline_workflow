@@ -4,10 +4,9 @@
 ! see /scratch2/NCEPDEV/land/data/fix/20231027
 ! as well as model physics options and forcing treatment method 
 
-  static_file      = "/scratch2/NCEPDEV/land/data/forcing/era5/static/C96/ufs-land_C96_hr3_static_fields.nc"
-  init_file        = "/scratch2/NCEPDEV/land/data/forcing/era5/init/C96/ufs-land_C96_hr3_era5_init_2009-12-31_23-00-00.nc"
-
-  forcing_dir      = "XXFORCDIR"
+  static_file="/scratch4/NCEPDEV/land/data/ufs-land-driver/vector_inputs/CXXRES.XXORES/ufs-land_CXXRES.XXORES_hr3_static_fields.nc"
+  init_file="/scratch4/NCEPDEV/land/data/ufs-land-driver/cold_start/CXXRES.XXORES/ERA5-CXXRES.XXORES_hr3_cold_start_glacier_1979-12-31_23:00:00.nc"
+  forcing_dir="XXFORCDIR"
  
   separate_output = .false.
   output_dir       = "./noahmp_output/"

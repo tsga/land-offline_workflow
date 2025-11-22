@@ -1,12 +1,12 @@
 # Settings file for submit_cycle, for running the DA_IMS_test 
 
 # experiment name
-export exp_name=letkf_era5
-STARTDATE=2019120100
-ENDDATE=2019120300
+export exp_name=DA_letkf_era5
+STARTDATE=2021120100  #2019120112
+ENDDATE=2021120400    #2019120400
 
-#BASEDIR=/scratch2/BMC/gsienkf/${USER}/ # for PSL staff
-BASEDIR=/scratch1/NCEPDEV/da/${USER}/  # for EMC staff
+#export BASEDIR=/scratch4/BMC/gsienkf/${USER}/noah-mp # for PSL staff
+BASEDIR=/scratch3/NCEPDEV/stmp/${USER}/               # EMC
 
 # temporary directory where experiment is run from
 export WORKDIR=${BASEDIR}/workdir/
@@ -15,11 +15,9 @@ export WORKDIR=${BASEDIR}/workdir/
 export OUTDIR=${BASEDIR}/cycle_land/${exp_name}/
 
 # directory of land-offline_workflow repo
-export CYCLEDIR=${BASEDIR}/land-offline_workflow/
+# export CYCLEDIR=/scratch4/BMC/gsienkf/${USER}/land-offline_workflow/
+export CYCLEDIR=/scratch3/NCEPDEV/da/${USER}/land-offline_workflow/
 ############################
-
-# decide if GFSv17
-export GFSv17="NO"
 
 # run (true) ensemble. NO for LETKFOI
 export do_enkf="YES"
@@ -27,10 +25,6 @@ export do_enkf="YES"
 # for LETKF, this is size of ensemble.
 # for LETKF-OI pseudo ensemble, or non-ensemble runs use 1 
 export ensemble_size=20
-
-# number of tiles and vector size
-export num_tiles=6         # 1 for regional
-export vector_size=18320   # 1067297 C768
 
 # number of tiles
 export num_tiles=6         # 1 for regional
@@ -43,8 +37,8 @@ export FCSTHR=24
 export PCYC_DEL=6
 
 #FV3 resolution
-export RES=96   # 768
-export NPZ=64   # vertical layers
+export RES=96   
+export NPZ=127   # vertical layers
 export ORES=mx100
 export TPATH=/scratch3/NCEPDEV/global/role.glopara/fix/orog/20240917/C${RES}/
 export TSTUB=C${RES}.${ORES}_oro_data # file stub for orography files in $TPATH
@@ -52,6 +46,10 @@ export TSTUB=C${RES}.${ORES}_oro_data # file stub for orography files in $TPATH
 # number of cycles to submit in a single job
 # on hera in the debug queue 20 is a good number.
 export cycles_per_job=20
+
+# directory with initial conditions
+export ICSDIR=/scratch4/NCEPDEV/land/data/RESTARTS/C${RES}/
+#export ICSDIR=${CYCLEDIR}/TESTS/RESTARTS/
 
 # namelist for do_landDA.sh
 # set to "openloop" to not call do_landDA.sh
@@ -64,34 +62,27 @@ export DA_config06=${DA_config}
 export DA_config12=${DA_config} 
 export DA_config18=${DA_config} 
 
-# directory with initial conditions
-# can find some here:
-export ICSDIR=${CYCLEDIR}/TESTS/RESTARTS/
-#/scratch2/BMC/gsienkf/Clara.Draper/DA_test_cases/land-offline_workflow/DA_test_era5/mem000/restarts/vector/
+# JEDI nproc--make sure to sync with iolayout
+export NPROC_JEDI=6
+# export NPROC_NOMP=6     # This is calculated by the code--- specify only if necessary 
 
 #forcing options: gdas, gswp3, gefs_ens, era5
 export atmos_forc=era5
 
-# settings for ensemble forcing perturbation
-
+#---------- settings for ensemble forcing perturbation
 # forcing prefix
 # gdas: C${RES}_GDAS_forcing_
 # era: C${RES}_ERA5_forcing_
 export forcing_prefix=C${RES}_ERA5_forcing_
-export forcing_dir="/scratch2/NCEPDEV/land/data/forcing/era5/datm/C96/"
+export forcing_dir="/scratch4/NCEPDEV/land/data/ufs-land-driver/datm/ERA5/CXXRES.XXORES/"
 
-export static_file="/scratch2/NCEPDEV/land/data/forcing/era5/static/C96/ufs-land_C96_hr3_static_fields.nc"
+export static_file="/scratch4/NCEPDEV/land/data/ufs-land-driver/vector_inputs/CXXRES.XXORES/ufs-land_CXXRES.XXORES_hr3_static_fields.nc"
 export stochy_init_exist="NO"   #YES: init patterns read from cycledir/stochy/restart. NO: initialized from seed
 export stochy_init_dir="${CYCLEDIR}/STOCHY/RESTART/"
 # export stochy_init_found="NO" 
 
 export perturb_forcing="YES"
 export perturb_state="YES" # 
-
-# JEDI nproc--make sure to sync with iolayout
-export NPROC_JEDI=6
-
-# export NPROC_NOMP=6     # This is calculated by the code--- specify only if necessary 
 
 # x y and io layout
 export LayX=1

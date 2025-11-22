@@ -6,13 +6,12 @@
 #SBATCH --tasks-per-node=6
 #SBATCH -t 00:30:00
 #SBATCH --cpus-per-task=1
-#SBATCH -t 00:30:00
-#SBATCH -o erlog_noahmp.%j
-#SBATCH -e erlog_noahmp.%j
-##SBATCH -t 02:40:00
 ##SBATCH --qos=batch
 ##SBATCH --nodes=6
 ##SBATCH --tasks-per-node=36
+##SBATCH -t 02:40:00
+#SBATCH -o log_noahmp.%j.log
+#SBATCH -e err_noahmp.%j.err
 
 ############################
 # loop over time steps
@@ -169,7 +168,8 @@ while [ $date_count -lt $cycles_per_job ]; do
         cd $WORKDIR
 
         # ############################
-        # #  convert back to vector, run model (all members) 
+        #  convert restarts from tile to vector
+        ############################   
 
         echo '************************************************'
         echo 'calling tile2vector' 
@@ -202,7 +202,7 @@ while [ $date_count -lt $cycles_per_job ]; do
         fi
         # save analysis restart
         cp ${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${MEM_MODL_OUTDIR}/restarts/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-
+        
         if [[ "$ensemble_size" -gt 1  ]]; then 
 
             for ie in $(seq $ensemble_size)

@@ -94,5 +94,5 @@
   iseed_lndp=9990
   lndp_tau= XXTAU,  
   lndp_lscale = XXLSC,
-  lndp_model_type = 1
+!  lndp_model_type = 1
 /

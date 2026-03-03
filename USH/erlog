@@ -1,0 +1,120 @@
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) hdf5/1.14.3     2) nco/5.2.4     3) netcdf-c/4.9.2     4) udunits/2.2.28
+
+starting bufr2ioda
+Found /scratch3/NCEPDEV/stmp/Tseganeh.Gichamo/CIT/COMROOT/C192E96_hybatmsoilDA/gdas.20240601/00/obs//gdas.t00z.prepbufr; Use it as observation 
+processing prepbufr_adpsfc.yaml
+0: PRE-MAIN-INFO BufrParser: Parsing file ./prepbufr
+0: PRE-MAIN-INFO Executing Queries
+0: PRE-MAIN-INFO Building Bufr Data
+0: PRE-MAIN-INFO Exporting Data
+0: PRE-MAIN-INFO Exporting variable = timestamp
+0: PRE-MAIN-INFO Exporting variable = timeOffset
+0: PRE-MAIN-INFO Exporting variable = longitude
+0: PRE-MAIN-INFO Exporting variable = latitude
+0: PRE-MAIN-INFO Exporting variable = stationIdentification
+0: PRE-MAIN-INFO Exporting variable = stationElevation
+0: PRE-MAIN-INFO Exporting variable = prepbufrReportType
+0: PRE-MAIN-INFO Exporting variable = dumpReportType
+0: PRE-MAIN-INFO Exporting variable = prepbufrDataLvlCat
+0: PRE-MAIN-INFO Exporting variable = pressure
+0: PRE-MAIN-INFO Exporting variable = stationPressure
+0: PRE-MAIN-INFO Exporting variable = stationPressureQualityMarker
+0: PRE-MAIN-INFO Exporting variable = stationPressureError
+0: PRE-MAIN-INFO Exporting variable = stationPressureTunedError
+0: PRE-MAIN-INFO Exporting variable = heightOfObservation
+0: PRE-MAIN-INFO Exporting variable = heightOfObservationQualityMark
+0: PRE-MAIN-INFO Exporting variable = specificHumidity
+0: PRE-MAIN-INFO Exporting variable = specificHumidityError
+0: PRE-MAIN-INFO Exporting variable = specificHumidityQualityMarker
+0: PRE-MAIN-INFO Exporting variable = relativeHumidityError
+0: PRE-MAIN-INFO Exporting variable = relativeHumidityTunedError
+0: PRE-MAIN-INFO Exporting variable = dewpointTemperature
+0: PRE-MAIN-INFO Exporting variable = airTemperature
+0: PRE-MAIN-INFO Exporting variable = airTemperatureQualityMarker
+0: PRE-MAIN-INFO Exporting variable = airTemperatureError
+0: PRE-MAIN-INFO Exporting variable = airTemperatureTunedError
+0: PRE-MAIN-INFO Exporting variable = windEastward
+0: PRE-MAIN-INFO Exporting variable = windNorthward
+0: PRE-MAIN-INFO Exporting variable = windQualityMarker
+0: PRE-MAIN-INFO Exporting variable = windError
+0: PRE-MAIN-INFO Exporting variable = windTunedError
+0: PRE-MAIN-INFO Exporting variable = pressureReducedToMeanSeaLevel
+0: PRE-MAIN-INFO Exporting variable = pressureReducedToMeanSeaLevelQualityMarker
+0: PRE-MAIN-INFO Exporting variable = seaTemperature
+0: PRE-MAIN-INFO Exporting variable = seaTemperatureQualityMarker
+0: PRE-MAIN-INFO Exporting variable = seaTemperatureError
+0: PRE-MAIN-INFO Exporting variable = seaTemperatureMethod
+0: PRE-MAIN-INFO Exporting variable = depthBelowSeaSurface
+0: PRE-MAIN-INFO Exporting variable = heightOfWaves
+0: PRE-MAIN-INFO Exporting variable = presentWeather
+0: PRE-MAIN-INFO Exporting variable = maximumWindGustSpeed
+0: PRE-MAIN-INFO Exporting variable = verticalSignificance
+0: PRE-MAIN-INFO Exporting variable = cloudAmount
+0: PRE-MAIN-INFO Exporting variable = heightOfBaseOfCloud
+0: PRE-MAIN-INFO Exporting variable = cloudCoverTotal
+0: PRE-MAIN-INFO Exporting variable = heightAboveSurfaceOfBaseOfLowestCloud
+0: PRE-MAIN-INFO Finished [5.719s]
+
+real	0m7.394s
+user	0m0.008s
+sys	0m0.025s
+bufr2ioda.x completed cleanly
+processing prepbufr_sfcshp.yaml
+0: PRE-MAIN-INFO BufrParser: Parsing file ./prepbufr
+0: PRE-MAIN-INFO Executing Queries
+0: PRE-MAIN-INFO Building Bufr Data
+0: PRE-MAIN-INFO Exporting Data
+0: PRE-MAIN-INFO Exporting variable = timestamp
+0: PRE-MAIN-INFO Exporting variable = timeOffset
+0: PRE-MAIN-INFO Exporting variable = longitude
+0: PRE-MAIN-INFO Exporting variable = latitude
+0: PRE-MAIN-INFO Exporting variable = stationIdentification
+0: PRE-MAIN-INFO Exporting variable = stationElevation
+0: PRE-MAIN-INFO Exporting variable = prepbufrReportType
+0: PRE-MAIN-INFO Exporting variable = dumpReportType
+0: PRE-MAIN-INFO Exporting variable = prepbufrDataLvlCat
+0: PRE-MAIN-INFO Exporting variable = pressure
+0: PRE-MAIN-INFO Exporting variable = stationPressure
+0: PRE-MAIN-INFO Exporting variable = stationPressureQualityMarker
+0: PRE-MAIN-INFO Exporting variable = stationPressureError
+0: PRE-MAIN-INFO Exporting variable = stationPressureTunedError
+0: PRE-MAIN-INFO Exporting variable = heightOfObservation
+0: PRE-MAIN-INFO Exporting variable = heightOfObservationQualityMark
+0: PRE-MAIN-INFO Exporting variable = specificHumidity
+0: PRE-MAIN-INFO Exporting variable = specificHumidityError
+0: PRE-MAIN-INFO Exporting variable = specificHumidityQualityMarker
+0: PRE-MAIN-INFO Exporting variable = relativeHumidityError
+0: PRE-MAIN-INFO Exporting variable = relativeHumidityTunedError
+0: PRE-MAIN-INFO Exporting variable = dewpointTemperature
+0: PRE-MAIN-INFO Exporting variable = airTemperature
+0: PRE-MAIN-INFO Exporting variable = airTemperatureQualityMarker
+0: PRE-MAIN-INFO Exporting variable = airTemperatureError
+0: PRE-MAIN-INFO Exporting variable = airTemperatureTunedError
+0: PRE-MAIN-INFO Exporting variable = windEastward
+0: PRE-MAIN-INFO Exporting variable = windNorthward
+0: PRE-MAIN-INFO Exporting variable = windQualityMarker
+0: PRE-MAIN-INFO Exporting variable = windError
+0: PRE-MAIN-INFO Exporting variable = windTunedError
+0: PRE-MAIN-INFO Exporting variable = pressureReducedToMeanSeaLevel
+0: PRE-MAIN-INFO Exporting variable = pressureReducedToMeanSeaLevelQualityMarker
+0: PRE-MAIN-INFO Exporting variable = seaTemperature
+0: PRE-MAIN-INFO Exporting variable = seaTemperatureQualityMarker
+0: PRE-MAIN-INFO Exporting variable = seaTemperatureError
+0: PRE-MAIN-INFO Exporting variable = seaTemperatureMethod
+0: PRE-MAIN-INFO Exporting variable = depthBelowSeaSurface
+0: PRE-MAIN-INFO Exporting variable = heightOfWaves
+0: PRE-MAIN-INFO Exporting variable = presentWeather
+0: PRE-MAIN-INFO Exporting variable = maximumWindGustSpeed
+0: PRE-MAIN-INFO Exporting variable = verticalSignificance
+0: PRE-MAIN-INFO Exporting variable = cloudAmount
+0: PRE-MAIN-INFO Exporting variable = heightOfBaseOfCloud
+0: PRE-MAIN-INFO Exporting variable = cloudCoverTotal
+0: PRE-MAIN-INFO Exporting variable = heightAboveSurfaceOfBaseOfLowestCloud
+0: PRE-MAIN-INFO Finished [1.681s]
+
+real	0m2.185s
+user	0m0.009s
+sys	0m0.019s
+bufr2ioda.x completed cleanly

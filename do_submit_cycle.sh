@@ -27,7 +27,7 @@ export CYCLEDIR=${CYCLEDIR:-$(pwd)}
 
 export vec2tileexec=${CYCLEDIR}/vector2tile/vector2tile_converter.exe
 export LSMexec=${CYCLEDIR}/ufs-land-driver/run/ufsLand.exe
-export EnsGenExe=${CYCLEDIR}/stochastic_physics/EnsGen.x
+export EnsGenExe=${CYCLEDIR}/land_ensemble_gen/EnsGen.x
 
 export DADIR=${CYCLEDIR}/DA_update/
 export DAscript=${DADIR}/do_landDA.sh

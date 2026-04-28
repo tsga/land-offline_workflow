@@ -3,10 +3,10 @@
 #SBATCH -o log_noahmp.%j.log
 #SBATCH -e err_noahmp.%j.err
 #############------------------debug 
-#SBATCH --qos=debug
+#SBATCH --qos=batch
 #SBATCH --nodes=2
 #SBATCH --tasks-per-node=120
-#SBATCH -t 00:29:00
+#SBATCH -t 07:29:00
 #############------------------batch
 ##SBATCH --cpus-per-task=2
 ##SBATCH --mem-per-cpu=8G
@@ -44,6 +44,7 @@ while [ $date_count -lt $cycles_per_job ]; do
         if [ $KEEPWORKDIR == "NO" ];   then 
             rm -rf $WORKDIR
         fi
+        date
         exit  
     fi
 
@@ -376,7 +377,7 @@ while [ $date_count -lt $cycles_per_job ]; do
    #         cd $MEM_WORKDIR
    #             
    #         #TODO: modify NoahMP to have mpi-group for each ensemble member and compare runtimes
-   #         time srun '--export=ALL' --exclusive --label -K -n ${NPROC_NOMP} --mem-per-cpu ${SLURM_MEM_PER_CPU} $LSMexec   &
+   #         time srun '--export=ALL' --exclusive --label -K -n ${nt} --mem-per-cpu ${SLURM_MEM_PER_CPU} $LSMexec   &
    #         # #-N1-1 --exclusive
    # 
    #         # # srun -l --multi-prog $lsm_tasks_file
@@ -392,9 +393,9 @@ while [ $date_count -lt $cycles_per_job ]; do
 
    #     cd $WORKDIR
    # else
-        # copied in do_submit_cycle: run using baseline snow parameter table
-        # cp ${CYCLEDIR}/ufs-land-driver/ccpp-physics/physics/SFC_Models/Land/Noahmp/noahmptable.tbl $WORKDIR/noahmptable.tbl
-        time srun '--export=ALL' --label -K -n $SLURM_NTASKS $LSMexec
+       # copied in do_submit_cycle: run using baseline snow parameter table
+       # cp ${CYCLEDIR}/ufs-land-driver/ccpp-physics/physics/SFC_Models/Land/Noahmp/noahmptable.tbl $WORKDIR/noahmptable.tbl
+       time srun '--export=ALL' --label -K -n $SLURM_NTASKS $LSMexec
    # fi
 
     # Compute ensemble mean

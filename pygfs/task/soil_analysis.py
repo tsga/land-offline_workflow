@@ -50,6 +50,11 @@ class SoilAnalysis(Analysis):
 
         _res = int(self.task_config['CASE'][1:])
 
+        if self.task_config.DOHYBVAR:
+            _BERROR_YAML = f"soil_background_error_hybrid_{self.task_config.STATICB_TYPE}_{self.task_config.LOCALIZATION_TYPE}"
+        else:
+            _BERROR_YAML = f"soil_background_error_static_{self.task_config.STATICB_TYPE}"
+
         # Extend task_config with variables repeatedly used across this class
         self.task_config.update(AttrDict(
             {
@@ -57,8 +62,17 @@ class SoilAnalysis(Analysis):
                 'npy_ges': _res + 1,
                 'npz_ges': self.task_config.LEVS - 1,
                 'npz': self.task_config.LEVS - 1,
+               # 'npx_anl': _res_anl + 1,
+               # 'npy_anl': _res_anl + 1,
+               # 'npz_anl': self.task_config.LEVS - 1,
+               # 'npx_his': _res_his + 1,
+               # 'npy_his': _res_his + 1,
+               # 'npz_his': self.task_config.LEVS - 1,
                 'soil_bkg_path': os.path.join('./', 'bkg'),
                 'soil_prepobs_path': os.path.join(self.task_config.DATA, 'prep'),
+                'BKG_TSTEP': "PT1H",  # Placeholder for 4D applications
+                'BERROR_YAML': _BERROR_YAML,
+
             }
         ))
 
@@ -98,7 +112,7 @@ class SoilAnalysis(Analysis):
 
         # initialize JEDI variational application
         logger.info(f"Initializing JEDI applications")
-        self.jedi_dict['soilanlvar'].initialize(clean_empty_obsspaces=True)
+        self.jedi_dict['soilanlvar'].initialize(clean_empty_obsspaces=False)
         self.jedi_dict['soilanladdinc'].initialize(self.task_config)
 
     @logit(logger)
@@ -167,7 +181,7 @@ class SoilAnalysis(Analysis):
                 dest = os.path.join(self.task_config.DATA, "anl", filename)
                 anllist.append([src, dest])
         FileHandler({'copy': anllist}).sync()
-
+#TODO: update this for csg files
         if self.task_config.DOIAU:
             logger.info("Copying increments to beginning of window")
             template_in = f'soilinc.{to_fv3time(self.task_config.current_cycle)}.sfc_data.tile{{tilenum}}.nc'
@@ -186,6 +200,10 @@ class SoilAnalysis(Analysis):
             logger.info(f"Processing analysis valid: {bkgtime}")
             logger.info("Create namelist for APPLY_INCR_EXE")
             nml_template = self.task_config.APPLY_INCR_NML_TMPL
+            if self.task_config.csg_increment:
+                inc_prefix=f'soilinc_{self.task_config.GPREFIX}csg_sfc.f006'
+            else:
+                inc_prefix=self.task_config.INC_PREFIX
             nml_config = {
                 'current_cycle': bkgtime,
                 'CASE': self.task_config.CASE,
@@ -198,8 +216,9 @@ class SoilAnalysis(Analysis):
                 'upd_stc': self.task_config.upd_stc,
                 'upd_slc': self.task_config.upd_slc,
                 'print_debug': self.task_config.print_debug,
-                'LSOIL_INCR': self.task_config.LSOIL_INCR,
-                'INC_PREFIX': self.task_config.INC_PREFIX
+                'lsoil_incr': self.task_config.LSOIL_INCR,
+                'inc_prefix': inc_prefix,
+                'csg_increment': self.task_config.csg_increment
             }
             nml_data = Jinja(nml_template, nml_config).render
             logger.debug(f"apply_incr_nml:\n{nml_data}")

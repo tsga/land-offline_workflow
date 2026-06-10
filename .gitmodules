@@ -5,11 +5,11 @@
 [submodule "DA_update"]
 	path = DA_update
 	url = https://github.com/tsga/land-DA_update
-        branch = sfc_tq2m
+        branch = csg
 [submodule "vector2tile"]
 	path = vector2tile
 	url = https://github.com/tsga/land-vector2tile  #  https://github.com/NOAA-PSL/land-vector2tile
-	branch = mpi #develop
+	branch = s3history
 [submodule "wxflow"]
 	path = wxflow
 	url = https://github.com/NOAA-EMC/wxflow

@@ -3,10 +3,10 @@
 #SBATCH -o log_noahmp.%j.log
 #SBATCH -e err_noahmp.%j.err
 #############------------------debug 
-#SBATCH --qos=debug
+#SBATCH --qos=batch
 #SBATCH --nodes=2
-#SBATCH --tasks-per-node=120
-#SBATCH -t 00:29:00
+#SBATCH --tasks-per-node=192
+#SBATCH -t 07:59:00
 #############------------------batch
 ##SBATCH --cpus-per-task=2
 ##SBATCH --mem-per-cpu=8G
@@ -58,7 +58,7 @@ while [ $date_count -lt $cycles_per_job ]; do
     MP=`echo $PREVDATE | cut -c5-6`
     DP=`echo $PREVDATE | cut -c7-8`
     HP=`echo $PREVDATE | cut -c9-10`
-    
+   
     # substring for next cycle
     NEXTDATE=`${incdate} $THISDATE $FCSTHR`
     nYYYY=`echo $NEXTDATE | cut -c1-4`
@@ -78,7 +78,7 @@ while [ $date_count -lt $cycles_per_job ]; do
     cd $WORKDIR
     
     source ${CYCLEDIR}/${landmods}
-
+    
     if [[ $do_jedi == "YES" ]]; then  
         ############################
         #  convert restarts from vector to tile
@@ -96,64 +96,20 @@ while [ $date_count -lt $cycles_per_job ]; do
         sed -i -e "s/XXMM/${MM}/g" vector2tile.namelist
         sed -i -e "s/XXDD/${DD}/g" vector2tile.namelist
         sed -i -e "s/XXHH/${HH}/g" vector2tile.namelist
-        sed -i -e "s/XXRES/${RES}/g" vector2tile.namelist
+        sed -i -e "s/XXYYYP/${YYYP}/g" vector2tile.namelist
+        sed -i -e "s/XXMP/${MP}/g" vector2tile.namelist
+        sed -i -e "s/XXDP/${DP}/g" vector2tile.namelist
+        sed -i -e "s/XXHP/${HP}/g" vector2tile.namelist
+	sed -i -e "s/XXRES/${RES}/g" vector2tile.namelist
 	sed -i -e "s/XXORES/${ORES}/g" vector2tile.namelist
         sed -i -e "s/XXTSTUB/${TSTUB}/g" vector2tile.namelist
         sed -i -e "s#XXTPATH#${FIXorog}/${CASE}/#g" vector2tile.namelist
         sed -i -e "s/XXFRACGRID/${frac_grid}/g" vector2tile.namelist
         sed -i -e "s#XXDATADIR#${DATADIR}/#g" vector2tile.namelist
         sed -i -e "s/XXENSZ/${ensemble_size}/g" vector2tile.namelist
-
-        ############################
-        # copy restarts to workdir, convert to tile for DA (all members) 
-       # if [[ "$ensemble_size" -gt 1  ]]; then 
-       #     #TODO: parallelize this 
-       #     for ie in $(seq $ensemble_size)
-       #     do
-       #         mem_ens="mem`printf %03i $ie`"
-       #         MEM_WORKDIR=${WORKDIR}/${mem_ens}
-       #         MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
-
-       # 	# copy restarts into work directory
-       #         rst_in=${MEM_MODL_OUTDIR}/vector/ufs_land_restart_back.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-       #         rst_out=${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-       #         if [[ -e ${rst_in} ]]; then
-       #             cp $rst_in $rst_out
-       #         else
-       #             echo "restart not found ${rst_in}; exiting"
-       #             exit 10
-       #         fi
-
-       #         cp $WORKDIR/vector2tile.namelist $MEM_WORKDIR/vector2tile.namelist
-
-       #         cd $MEM_WORKDIR
-       #         $vec2tileexec vector2tile.namelist
-       #         if [[ $? != 0 ]]; then
-       #             echo "vec2tile failed for $mem_ens"
-       #             exit 10
-       #         fi
-       #        
-       #     done
-       #     # wait
-       # else
-
-       #     rst_in=${OUTDIR}/vector/ufs_land_restart_back.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-       #     rst_out=${WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-       #     if [[ -e ${rst_in} ]]; then
-       #         cp $rst_in $rst_out
-       #     else
-       #         echo "restart not found ${rst_in}; exiting"
-       #         exit 10
-       #     fi
-    
-       #     $vec2tileexec vector2tile.namelist
-       #     if [[ $? != 0 ]]; then
-       #         echo "vec2tile failed"
-       #         exit 10
-       #     fi
-       # 	
-       # fi	
-        
+	sed -i -e "s/XXWRITES3H/${write_s3history}/g" vector2tile.namelist
+	sed -i -e "s/XXS3HRTYPE/${da_prefix}/g" vector2tile.namelist
+ 
         time srun '--export=ALL' --label -K -n $SLURM_NTASKS $vec2tileexec vector2tile.namelist
 
         ############################
@@ -185,6 +141,10 @@ while [ $date_count -lt $cycles_per_job ]; do
         sed -i -e "s/XXMM/${MM}/g" tile2vector.namelist
         sed -i -e "s/XXDD/${DD}/g" tile2vector.namelist
         sed -i -e "s/XXHH/${HH}/g" tile2vector.namelist
+        sed -i -e "s/XXYYYP/${YYYP}/g" vector2tile.namelist
+        sed -i -e "s/XXMP/${MP}/g" vector2tile.namelist
+        sed -i -e "s/XXDP/${DP}/g" vector2tile.namelist
+        sed -i -e "s/XXHP/${HP}/g" vector2tile.namelist
         sed -i -e "s/XXRES/${RES}/g" tile2vector.namelist
 	sed -i -e "s/XXORES/${ORES}/g" tile2vector.namelist
         sed -i -e "s/XXTSTUB/${TSTUB}/g" tile2vector.namelist
@@ -207,25 +167,12 @@ while [ $date_count -lt $cycles_per_job ]; do
 
        #         cp ${WORKDIR}/tile2vector.namelist $MEM_WORKDIR/tile2vector.namelist
 
-       #         cd $MEM_WORKDIR
-       #         $vec2tileexec tile2vector.namelist
-       #         if [[ $? != 0 ]]; then
-       #             echo "tile2vector failed for $mem_ens"
-       #             exit 10 
-       #         fi
-
        #         # save analysis restart
        #         cp ${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${MEM_MODL_OUTDIR}/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
 
        #     done
        #     # wait
        # else
-       #     $vec2tileexec tile2vector.namelist
-       #     if [[ $? != 0 ]]; then
-       #         echo "tile2vector failed"
-       #         exit 10
-       #     fi
-
        #     # save analysis restart
        #     cp ${WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${OUTDIR}/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
 
@@ -233,8 +180,8 @@ while [ $date_count -lt $cycles_per_job ]; do
         	
     fi #$do_jedi
     
-    # Forcing perturbation goes here
-    if [[ $do_enkf == "YES" ]]; then 
+    # Forcing perturbation goes here. Done daily at hr=00
+    if [[ $do_enkf == "YES" && "${HH}" == "00" ]]; then 
       
 	echo ""
 	echo 'Running Ens Forc Gen with Stochy'         #>> $logfile
@@ -296,9 +243,14 @@ while [ $date_count -lt $cycles_per_job ]; do
         sed -i -e "s/XXPERTSTATE/${perturb_state}/g" generate_ens_forc_state.nml
 
         forc_file=${forcing_dir}/${forc_inp_file}
-
+        
         #TODO: fix Noahmp so the following two lines are not needed
-        forc_inp_file_next=${forcing_prefix}${nYYYY}-${nMM}-${nDD}.nc
+        NEXTDAY=`${incdate} $THISDATE 24`
+        ndYYYY=`echo $NEXTDAY | cut -c1-4`
+        ndMM=`echo $NEXTDAY | cut -c5-6`
+        ndDD=`echo $NEXTDAY | cut -c7-8`
+	ndHH=`echo $NEXTDAY | cut -c9-10`
+        forc_inp_file_next=${forcing_prefix}${ndYYYY}-${ndMM}-${ndDD}.nc
         forc_file_next=${forcing_dir}/${forc_inp_file_next}
 
         for ie in $(seq $ensemble_size)

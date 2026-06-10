@@ -104,7 +104,7 @@ class SoilLetkfAnalysis(Analysis):
 
         # Initialize JEDI applications
         logger.info(f"Initializing JEDI applications")
-        self.jedi_dict['soilletkfanl'].initialize(clean_empty_obsspaces=True)
+        self.jedi_dict['soilletkfanl'].initialize(clean_empty_obsspaces=False)
         self.jedi_dict['soilletkfaddinc'].initialize(self.task_config)
         #self.jedi_dict['soilensanlobs'].initialize() #clean_empty_obsspaces=False)
         #self.jedi_dict['soilensanlsol'].initialize() #clean_empty_obsspaces=False)
@@ -163,7 +163,7 @@ class SoilLetkfAnalysis(Analysis):
         """
 
         #backgrounds needed to create analysis (b+inc) already copied to DATA/anl/mem by soil_letkf_config.yaml.j2
-
+#TODO: update this for csg files
         if self.task_config.DOIAU:
             logger.info("Copying increments to beginning of window")
             template_in = f'soilinc.{to_fv3time(self.task_config.current_cycle)}.sfc_data.tile{{tilenum}}.nc'
@@ -191,6 +191,10 @@ class SoilLetkfAnalysis(Analysis):
             logger.info(f"Processing analysis valid: {bkgtime}")
             logger.info(f"Create namelist for APPLY_INCR_EXE")
             nml_template = self.task_config.APPLY_INCR_NML_TMPL
+            if self.task_config.csg_increment:
+                inc_prefix=f'soilinc_{self.task_config.GPREFIX}csg_sfc.f006'
+            else:
+                inc_prefix=self.task_config.INC_PREFIX
             nml_config = {
                 'current_cycle': bkgtime,
                 'CASE': self.task_config.CASE,
@@ -203,8 +207,9 @@ class SoilLetkfAnalysis(Analysis):
                 'upd_stc': self.task_config.upd_stc,
                 'upd_slc': self.task_config.upd_slc,
                 'print_debug': self.task_config.print_debug,
-                'LSOIL_INCR': self.task_config.LSOIL_INCR,
-                'INC_PREFIX': self.task_config.INC_PREFIX
+                'lsoil_incr': self.task_config.LSOIL_INCR,
+                'inc_prefix': inc_prefix,
+                'csg_increment': self.task_config.csg_increment
             }
             nml_data = Jinja(nml_template, nml_config).render
             logger.debug(f"apply_incr_nml:\n{nml_data}")

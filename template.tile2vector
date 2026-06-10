@@ -16,6 +16,8 @@
 ! Time stamp for conversion for restart conversion
 
   restart_date = "XXYYYY-XXMM-XXDD XXHH:00:00"
+
+  prev_date = "XXYYYP-XXMP-XXDP XXHP:00:00"
   
 ! Path for static file  
   static_filename = "/scratch4/NCEPDEV/land/data/ufs-land-driver/vector_inputs/CXXRES.XXORES/ufs-land_CXXRES.XXORES_static_fields.nc"

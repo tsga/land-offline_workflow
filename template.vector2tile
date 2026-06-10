@@ -17,6 +17,8 @@
 
   restart_date = "XXYYYY-XXMM-XXDD XXHH:00:00"
   
+  prev_date = "XXYYYP-XXMP-XXDP XXHP:00:00"
+   
 ! Path for static file  
   static_filename = "XXDATADIR/ufs-land-driver/vector_inputs/CXXRES.XXORES/ufs-land_CXXRES.XXORES_static_fields.nc"
   
@@ -34,6 +36,10 @@
 
 ! ensemble size (1 for non-ens appl)
   ens_size = XXENSZ
+
+! write cube sphere history
+  write_s3history = XXWRITES3H
+  s3h_runtype = "XXS3HRTYPE"
 
 !------------------- only perturbation mapping -------------------
 ! layout, options: 1x4, 4x1, 2x2, an input settings for generating the perturbation file

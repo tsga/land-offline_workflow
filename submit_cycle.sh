@@ -3,10 +3,10 @@
 #SBATCH -o log_noahmp.%j.log
 #SBATCH -e err_noahmp.%j.err
 #############------------------debug 
-#SBATCH --qos=batch
+#SBATCH --qos=debug
 #SBATCH --nodes=2
 #SBATCH --tasks-per-node=192
-#SBATCH -t 07:59:00
+#SBATCH -t 00:29:00
 #############------------------batch
 ##SBATCH --cpus-per-task=2
 ##SBATCH --mem-per-cpu=8G
@@ -155,28 +155,25 @@ while [ $date_count -lt $cycles_per_job ]; do
         
         time srun '--export=ALL' --label -K -n $SLURM_NTASKS $vec2tileexec tile2vector.namelist
 
-#TODO: the restart_anl.nc would be saved from letkf_config
+        # save analysis vectors
+        if [[ $save_anl_vector == "YES" ]]; then
+            if [[ "$ensemble_size" -gt 1  ]]; then
 
-       # if [[ "$ensemble_size" -gt 1  ]]; then 
+              for ie in $(seq $ensemble_size)
+              do
+                  mem_ens="mem`printf %03i $ie`"
+                  MEM_WORKDIR=${WORKDIR}/${mem_ens}
+                  MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
 
-       #     for ie in $(seq $ensemble_size)
-       #     do
-       #         mem_ens="mem`printf %03i $ie`"
-       #         MEM_WORKDIR=${WORKDIR}/${mem_ens}
-       #         MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
+                  cp ${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${MEM_MODL_OUTDIR}/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
 
-       #         cp ${WORKDIR}/tile2vector.namelist $MEM_WORKDIR/tile2vector.namelist
+              done
+              # wait
+            else
+              cp ${WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${OUTDIR}/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
 
-       #         # save analysis restart
-       #         cp ${MEM_WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${MEM_MODL_OUTDIR}/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-
-       #     done
-       #     # wait
-       # else
-       #     # save analysis restart
-       #     cp ${WORKDIR}/ufs_land_restart.${YYYY}-${MM}-${DD}_${HH}-00-00.nc ${OUTDIR}/vector/ufs_land_restart_anal.${YYYY}-${MM}-${DD}_${HH}-00-00.nc
-
-       # fi   
+            fi
+        fi	
         	
     fi #$do_jedi
     
@@ -244,7 +241,7 @@ while [ $date_count -lt $cycles_per_job ]; do
 
         forc_file=${forcing_dir}/${forc_inp_file}
         
-        #TODO: fix Noahmp so the following two lines are not needed
+        #TODO: fix Noahmp so the following lines are not needed
         NEXTDAY=`${incdate} $THISDATE 24`
         ndYYYY=`echo $NEXTDAY | cut -c1-4`
         ndMM=`echo $NEXTDAY | cut -c5-6`
@@ -367,6 +364,26 @@ while [ $date_count -lt $cycles_per_job ]; do
         rm -f ${MEM_WORKDIR}/ufs_lr_mem*.nc
 
     fi
+
+    # save bkg vectors
+    if [[ $save_bkg_vector == "YES" ]]; then
+        if [[ "$ensemble_size" -gt 1  ]]; then
+
+          for ie in $(seq 0 $ensemble_size)
+          do
+              mem_ens="mem`printf %03i $ie`"
+              MEM_WORKDIR=${WORKDIR}/${mem_ens}
+              MEM_MODL_OUTDIR=${OUTDIR}/${mem_ens}
+
+              cp ${MEM_WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc  ${MEM_MODL_OUTDIR}/vector/ufs_land_restart_back.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc
+
+          done
+          # wait
+        else
+          cp ${WORKDIR}/ufs_land_restart.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc ${OUTDIR}/vector/ufs_land_restart_back.${nYYYY}-${nMM}-${nDD}_${nHH}-00-00.nc
+
+        fi
+    fi    
 
     echo "Finished job number, ${date_count},for  date: ${THISDATE}" >> $logfile
 

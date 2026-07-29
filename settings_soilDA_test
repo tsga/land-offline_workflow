@@ -88,7 +88,7 @@ export OBS_LIST_YAML="${JEDIWORKDIR}/soil_obs_list.yaml.j2"
 
 export EXECgdas=${LANDDADIR}/GDASApp/build/bin/
 export PARMgdas=${LANDDADIR}/GDASApp/parm/
-export FIXgdas=${LANDDADIR}/jedi/fv3-jedi/Data
+export FIXgdas=${HOMEgfs}/fix/gdas/
 
 export APRUN_SOILANL="time srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_JEDI} --mem=0 --cpus-per-task=1"
 export APRUN_SOILLETKFANL="time srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_JEDI} --mem=0 --cpus-per-task=1"

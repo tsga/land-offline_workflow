@@ -4,3 +4,8 @@ log_noahmp.*
 *.namelist
 exp_out/*
 analdates.sh
+pygfs/jedi/__pycache__/
+pygfs/__pycache__/
+pygfs/task/__pycache__/
+pygfs/ufswm/__pycache__/
+pygfs/utils/__pycache__/

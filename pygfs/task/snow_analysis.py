@@ -184,11 +184,9 @@ class SnowAnalysis(Analysis):
         """
 
         # Archive, compress, and save diag files in COM directory
-        # Comment out compression step as it often hangs in the cycled run due to too-many diag files
-        # needs to be compressed in the same directory
-        #logger.info(f"Saving observation diag files to COM")
-        #self.jedi_dict['snowanlvar'].save_obsdataout(self.task_config.COMOUT_SNOW_ANALYSIS,
-        #                                             f"{self.task_config.APREFIX}snow_analysis.ioda_hofx")
+        logger.info(f"Saving observation diag files to COM")
+        self.jedi_dict['snowanlvar'].save_obsdataout(self.task_config.COMOUT_SNOW_DIAG,
+                                                     f"{self.task_config.RUN}.{to_YMDH(self.task_config.current_cycle)}.snow_analysis.ioda_hofx")
 
         # Save files to COM
         logger.info(f"Saving files to COM")
@@ -335,6 +333,14 @@ class SnowAnalysis(Analysis):
             Instance of the SnowAnalysis object
         """
 
+        # Check if add_increments should be skipped
+        # Handle both string and boolean values
+        do_snow_add_increments = getattr(self.task_config, 'DO_SNOW_ADD_INCREMENTS', 'YES')
+        if isinstance(do_snow_add_increments, bool):
+            do_snow_add_increments = 'YES' if do_snow_add_increments else 'NO'
+        else:
+            do_snow_add_increments = str(do_snow_add_increments).upper()
+
         # need backgrounds to create analysis from increments after LETKF
         logger.info("Copy backgrounds into anl/ directory for creating analysis from increments")
         bkgtimes = []
@@ -351,6 +357,12 @@ class SnowAnalysis(Analysis):
                 dest = os.path.join(self.task_config.DATA, "anl", filename)
                 anllist.append([src, dest])
         FileHandler({'copy': anllist}).sync()
+
+        # If DO_SNOW_ADD_INCREMENTS is NO, skip the increment application
+        if do_snow_add_increments == 'NO':
+            logger.info("DO_SNOW_ADD_INCREMENTS is set to NO. Skipping add_increments step.")
+            logger.info("Backgrounds have been copied to anl/ directory for archive purposes.")
+            return
 
         if self.task_config.DOIAU:
             logger.info("Copying increments to beginning of window")
@@ -374,7 +386,7 @@ class SnowAnalysis(Analysis):
                 'current_cycle': bkgtime,
                 'CASE': self.task_config.CASE,
                 'DATA': self.task_config.DATA,
-                'HOMEgfs': self.task_config.HOMEgfs,
+                'HOMEglobal': self.task_config.HOMEglobal,
                 'OCNRES': self.task_config.OCNRES,
                 'ens_size': self.task_config.ens_size,
                 'ntiles': self.task_config.ntiles,

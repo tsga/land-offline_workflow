@@ -72,7 +72,9 @@ export RUN=gdas
 export HOMEgfs=${HOMEdir}/HOMEgfs   #until a better solution is found
 export HOMEglobal=${HOMEdir}/HOMEgfs       #TODO: update to homeglobal
 export PARMgfs=${HOMEgfs}/parm
+export PARMglobal=${HOMEglobal}/parm
 export FIXgfs=${HOMEgfs}/fix
+export FIXglobal=${HOMEgfs}/fix
 
 export DATA=${JEDIWORKDIR}
 export COMIN_OBS=${JEDIWORKDIR}/COMIN_OBS

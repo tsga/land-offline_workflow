@@ -34,9 +34,8 @@ analType=snow
 # - sfcsno
 # - snocvr_snomad
 OBS_TYPES=("IMS") #SFCSNO" "GHCN" "IMS")  # format: ("OBS1" "OBS2"...)
-# JEDI call type for each obs_type above. options: DA, HOFX
-JEDI_TYPES=("DA") # "DA" "DA")  # format ("DA" "HOFX"...)
-
+# JEDI call type for each obs_type above. options: DA
+JEDI_TYPES=("DA") # "DA" "DA")  # format ("DA" "DA"...)
 # When call DA in monitor mode (e.g., output O-F for an open-loop), set below to "NO" *and* initiate a non-ensembled snow DA run
 export DO_SNOW_ADD_INCREMENTS="YES"
 
@@ -48,8 +47,9 @@ WINLEN=${FCSTHR:-24}
 
 # this is no longer optional
 export OBSDIR=${DATADIR}/DA/
+
 # berr dir
-export BCOV_DIR="${DATADIR}/DA/bump_snow/"  #TODO change to soil B
+export BCOV_DIR="${DATADIR}/DA/bump_snow/"
 
 # IAU related parameters
 export DOIAU="NO"        # Enable 4DIAU for control with 3 increments
@@ -76,29 +76,29 @@ export FIXglobal=${HOMEgfs}/fix
 
 export DATA=${JEDIWORKDIR}
 export COMIN_OBS=${JEDIWORKDIR}/COMIN_OBS     
+export COMIN_ATMOS_RESTART_PREV=${WORKDIR}
+export COMIN_ATMOS_RESTART_PREV_ENS=${WORKDIR}
+export COMIN_ATMOS_RESTART=${WORKDIR}
 
 export COMOUT_SNOW_ANALYSIS=${OUTDIR}/DA/jedi_anl
 export COMOUT_CONF=${OUTDIR}/DA/jedi_conf
 export COMOUT_SNOW_DIAG=${OUTDIR}/DA/hofx
-
-export COMIN_ATMOS_RESTART_PREV=${WORKDIR}   #${JEDIWORKDIR}/mem000
-export COMIN_ATMOS_RESTART_PREV_ENS=${WORKDIR}  #${JEDIWORKDIR}
-export COMIN_ATMOS_RESTART=${WORKDIR}
 
 export OBS_LIST_YAML="${JEDIWORKDIR}/snow_obs_list.yaml.j2"
 #export COMINobsproc_prfx=/scratch3/NCEPDEV/global/role.glopara/dump/        #gdas.${YYYY}${MM}${DD}/${HH}/atmos
 #export COMINobsforge_prfx=/scratch3/NCEPDEV/global/role.glopara/dump_ioda/  #gdas.${YYYY}${MM}${DD}/${HH}
 
 export EXECgdas=${LANDDADIR}/GDASApp/build/bin/
-export EXECglobal=${EXECgdas}
 export EXECgfs=${EXECgdas}
+export EXECglobal=${EXECgdas}
 
 export PARMgdas=${LANDDADIR}/GDASApp/parm/
 export FIXgdas=${HOMEgfs}/fix/gdas/
 
-export APRUN_SNOWANL="srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_JEDI} --mem=0 --cpus-per-task=2"
-export APRUN_APPLY_INCR="srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_INC}"
-export APRUN_SNOWLETKFANL="srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_JEDI} --mem=0" # --cpus-per-task=2"
+##NOTE for snow analysis with IMS, make sure the allocated procs are 2*(6*layout_x*layout_y)
+export APRUN_SNOWANL="time srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_JEDI} --mem=0  --cpus-per-task=2"
+export APRUN_APPLY_INCR="time srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_INC}"
+export APRUN_SNOWLETKFANL="time srun -l --export=ALL --hint=nomultithread --distribution=block:block -n ${NPROC_JEDI} --mem=0  --cpus-per-task=2"
 
 # Name of the executable that applies increment to bkg and its namelist template
 export APPLY_INCR_EXE="${EXECgdas}/apply_incr.exe"  

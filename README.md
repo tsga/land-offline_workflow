@@ -24,7 +24,7 @@ COMPILING and TESTING.
 
 2a. load relevant modules for Ursa or GAEA C6
 >source land_mods_ursa or source land_mods_gaeac6
-(these are the modules needed for steps 2b, 2c - only works for Ursa for now).
+(these are the modules needed for steps 2b, 2c).
 
 2b. 
 > cd ufs-land-driver
@@ -61,6 +61,8 @@ COMPILING and TESTING.
 
 > cd land_ensemble_gen
 
+> source ../stochy_mods_ursa OR source ../stochy_mods_gaeac6
+
 > ./compile_ens_intel
 
 3. Run the test.
@@ -75,9 +77,7 @@ COMPILING and TESTING.
  
 > do_submit_test.sh 
 
-Once completed, to check snow DA output:
-
-> (For snowDA) check_snowDA_test.sh
+> A suite of regression tests can be found in the reg_tests directory
 
 RUNNING YOUR OWN EXPERIMENTS 
 

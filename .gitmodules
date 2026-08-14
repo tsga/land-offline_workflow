@@ -8,8 +8,8 @@
         branch = csg
 [submodule "vector2tile"]
 	path = vector2tile
-	url = https://github.com/tsga/land-vector2tile  #  https://github.com/NOAA-PSL/land-vector2tile
-	branch = s3history
+	url = https://github.com/NOAA-PSL/land-vector2tile
+	branch = develop
 [submodule "wxflow"]
 	path = wxflow
 	url = https://github.com/NOAA-EMC/wxflow
